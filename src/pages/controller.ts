@@ -1,36 +1,44 @@
-import { Body, Get, HttpCode, JsonController, Param, Post, Put } from "routing-controllers"
-import { Page, pagesById } from "./data"
+import {
+  Body,
+  Get,
+  HttpCode,
+  JsonController,
+  NotFoundError,
+  Param,
+  Post,
+  Put,
+} from "routing-controllers"
 
-interface PageDatabaseResult {
-  [pages: string]: Page[]
-}
+import Page from "./entity"
 
 @JsonController()
 export default class PageController {
   @Get("/pages")
-  public getAllPages = (): PageDatabaseResult => {
-    const pages = Object.values(pagesById).map(page => page)
+  public async getAllPages() {
+    const pages = await Page.find()
 
     return { pages }
   }
 
   @Get("/pages/:id")
-  public getPage(@Param("id") id: number): Page {
-    return pagesById[id]
+  public getPage(@Param("id") id: number) {
+    return Page.findOne(id)
   }
 
   @Put("/pages/:id")
-  public updatePage(@Param("id") id: number, @Body() body: Partial<Page>): Page {
-    // tslint:disable-next-line: no-console
-    console.log(`Incoming PUT body param:`, body)
-    return pagesById[id]
+  public async updatePage(@Param("id") id: number, @Body() body: Partial<Page>) {
+    const foundPage = await Page.findOne({ id })
+
+    if (foundPage === undefined) {
+      throw new NotFoundError("Cannot find page")
+    }
+
+    return Page.merge(foundPage, body).save()
   }
 
   @Post("/pages")
   @HttpCode(201)
-  public createPage(@Body() body: Page): Page {
-    // tslint:disable-next-line: no-console
-    console.log(`Incoming POST body param:`, body)
-    return body
+  public createPage(@Body() page: Page) {
+    return page.save()
   }
 }
