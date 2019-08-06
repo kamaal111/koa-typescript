@@ -1,4 +1,5 @@
 import {
+  Authorized,
   Body,
   Get,
   HttpCode,
@@ -42,6 +43,7 @@ export default class PageController {
     return Page.merge(foundPage, body).save()
   }
 
+  @Authorized()
   @Post("/pages")
   @HttpCode(201)
   public createPage(@Body() page: Page): Promise<Page> {

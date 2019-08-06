@@ -1,5 +1,5 @@
 import "reflect-metadata"
-import { createKoaServer } from "routing-controllers"
+import { Action, createKoaServer } from "routing-controllers"
 
 import setupDb from "./db"
 
@@ -7,9 +7,24 @@ import loginsController from "./logins/controller"
 import PageController from "./pages/controller"
 import UserController from "./users/controller"
 
-const port: string | number = process.env.PORT || 4000
+import { verifyJWT } from "./jwt"
 
-const app = createKoaServer({ controllers: [PageController, UserController, loginsController] })
+const port = process.env.PORT || 4000
+
+const app = createKoaServer({
+  authorizationChecker: (action: Action) => {
+    const header: string = action.request.headers.authorization
+
+    if (header && header.startsWith("Bearer ")) {
+      const [, token] = header.split(" ")
+
+      return !!(token && verifyJWT(token))
+    }
+    // ...
+    return false
+  },
+  controllers: [PageController, UserController, loginsController],
+})
 
 setupDb()
   // tslint:disable-next-line: no-console
