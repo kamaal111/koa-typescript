@@ -11,17 +11,23 @@ import {
 
 import Page from "./entity"
 
+interface FindAllPagesType {
+  [pages: string]: Page[]
+}
+
+type FindOnePageType = Page | undefined
+
 @JsonController()
 export default class PageController {
   @Get("/pages")
-  public async getAllPages() {
+  public async getAllPages(): Promise<FindAllPagesType> {
     const pages = await Page.find()
 
     return { pages }
   }
 
   @Get("/pages/:id")
-  public getPage(@Param("id") id: number) {
+  public getPage(@Param("id") id: number): Promise<FindOnePageType> {
     return Page.findOne(id)
   }
 
