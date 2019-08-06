@@ -3,6 +3,7 @@ import { DefaultNamingStrategy } from "typeorm/naming-strategy/DefaultNamingStra
 import { NamingStrategyInterface } from "typeorm/naming-strategy/NamingStrategyInterface"
 import { snakeCase } from "typeorm/util/StringUtils"
 import Page from "./pages/entity"
+import User from "./users/entity"
 
 class CustomNamingStrategy extends DefaultNamingStrategy implements NamingStrategyInterface {
   public tableName(targetName: string, userSpecifiedName: string): string {
@@ -24,7 +25,7 @@ class CustomNamingStrategy extends DefaultNamingStrategy implements NamingStrate
 
 export default () =>
   createConnection({
-    entities: [Page],
+    entities: [Page, User],
     logging: true,
     namingStrategy: new CustomNamingStrategy(),
     synchronize: true,
