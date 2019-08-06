@@ -31,7 +31,7 @@ export default class User extends BaseEntity {
   @IsString()
   @MinLength(8)
   @Exclude({ toPlainOnly: true })
-  @Column("text", { nullable: false })
+  @Column("text", { nullable: true })
   public password: string
 
   public async setPassword(rawPassword: string) {
