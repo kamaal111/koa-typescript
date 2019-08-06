@@ -1,4 +1,5 @@
 import {
+  BadRequestError,
   Body,
   Get,
   HttpCode,
@@ -32,19 +33,30 @@ export default class PageController {
   }
 
   @Put("/users/:id")
-  public async updatePage(@Param("id") id: number, @Body() body: Partial<User>) {
-    const foundPage = await User.findOne({ id })
+  public async updateUser(@Param("id") id: number, @Body() body: Partial<User>) {
+    const foundUser = await User.findOne({ id })
 
-    if (foundPage === undefined) {
-      throw new NotFoundError("Cannot find page")
+    if (foundUser === undefined) {
+      throw new NotFoundError("Cannot find user")
     }
 
-    return User.merge(foundPage, body).save()
+    return User.merge(foundUser, body).save()
   }
 
   @Post("/users")
   @HttpCode(201)
-  public createPage(@Body() page: User) {
-    return page.save()
+  public async createUser(@Body() user: User): Promise<User> {
+    const checkForDuplicate = await User.findOne({ where: { email: user.email } })
+
+    if (checkForDuplicate) {
+      throw new BadRequestError("User allready exists")
+    }
+
+    const { password, ...rest } = user
+    const entity = User.create(rest)
+
+    await entity.setPassword(password)
+
+    return entity.save()
   }
 }

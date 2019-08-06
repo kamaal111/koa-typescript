@@ -2,12 +2,14 @@ import "reflect-metadata"
 import { createKoaServer } from "routing-controllers"
 
 import setupDb from "./db"
+
+import loginsController from "./logins/controller"
 import PageController from "./pages/controller"
 import UserController from "./users/controller"
 
 const port: string | number = process.env.PORT || 4000
 
-const app = createKoaServer({ controllers: [PageController, UserController] })
+const app = createKoaServer({ controllers: [PageController, UserController, loginsController] })
 
 setupDb()
   // tslint:disable-next-line: no-console
