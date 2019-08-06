@@ -44,7 +44,7 @@ export default class PageController {
 
   @Post("/pages")
   @HttpCode(201)
-  public createPage(@Body() page: Page) {
+  public createPage(@Body() page: Page): Promise<Page> {
     return page.save()
   }
 }
